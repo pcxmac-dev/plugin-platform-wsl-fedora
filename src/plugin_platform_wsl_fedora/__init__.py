@@ -14,7 +14,7 @@ import os
 
 from liminal_libs.machines.wsl import WslDistribution, WslError
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 def _read_text(url: str) -> str:
@@ -32,6 +32,7 @@ class WslFedoraPlugin(WslDistribution):
     order = 701
     distribution = "FedoraLinux-42"
     family = "dnf"
+    docker_repository = "https://download.docker.com/linux/fedora"  # Docker's own, as its documentation gives it
     install_name = "FedoraLinux-42"
     DISTRIBUTION_VAR = "WSL_FEDORA_DISTRIBUTION"
     USER_VAR = "WSL_FEDORA_USER"

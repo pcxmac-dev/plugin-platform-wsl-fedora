@@ -60,3 +60,9 @@ def test_the_fedora_name_follows_what_is_installed_or_offered(monkeypatch):
     assert p.distribution_name == "FedoraLinux-42" and p.present()  # the one installed wins
     monkeypatch.setenv("WSL_FEDORA_DISTRIBUTION", "Fedora-custom")
     assert p.distribution_name == "Fedora-custom"
+
+
+def test_docker_comes_from_dockers_own_repository_for_the_distribution():
+    script = MACHINE.install_script()
+    assert MACHINE.docker_repository == "https://download.docker.com/linux/fedora" and "{repository}" not in script
+    assert "--from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo " in script and "dnf -y install docker-ce " in script
