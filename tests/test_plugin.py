@@ -42,7 +42,7 @@ def test_the_plugin_names_its_distribution_and_offers_its_engine(monkeypatch):
     monkeypatch.delenv("WSL_FEDORA_USER", raising=False)
     assert MACHINE.name == "wsl-fedora" and MACHINE.family == "dnf" and MACHINE.SYSTEM == "platform" and MACHINE.KIND == "machine"
     assert MACHINE.options == ("WSL_FEDORA_DISTRIBUTION", "WSL_FEDORA_USER") and MACHINE.user == "liminal"
-    fake = FakeWsl(distributions=[("FedoraLinux-42", "Running", "2")], docker=True)
+    fake = FakeWsl(distributions=[("Liminal-Fedora", "Running", "2")], docker=True)
     p = WslFedoraPlugin(wsl=Wsl(runner=fake))
     assert p.present() and p.status()["engine"]["installed"] and p.status()["family"] == "dnf"
     (inst,) = p.instances()
@@ -51,15 +51,18 @@ def test_the_plugin_names_its_distribution_and_offers_its_engine(monkeypatch):
     assert WslFedoraPlugin(wsl=Wsl(runner=FakeWsl())).instances() == ()
 
 
-def test_the_fedora_name_follows_what_is_installed_or_offered(monkeypatch):
+def test_liminals_fedora_is_installed_from_the_newest_offered_and_never_the_users(monkeypatch):
     monkeypatch.delenv("WSL_FEDORA_DISTRIBUTION", raising=False)
     fake = FakeWsl(distributions=[("Ubuntu", "Stopped", "2")], online=["Ubuntu", "FedoraLinux-42", "FedoraLinux-43"])
     p = WslFedoraPlugin(wsl=Wsl(runner=fake))
-    assert p.distribution_name == "FedoraLinux-43" and p.install_name == "FedoraLinux-43"  # the newest offered
-    fake.distributions.append(("FedoraLinux-42", "Running", "2"))
-    assert p.distribution_name == "FedoraLinux-42" and p.present()  # the one installed wins
+    assert p.distribution_name == "Liminal-Fedora" and p.install_name == "FedoraLinux-43"  # the newest offered
+    fake.distributions.append(("FedoraLinux-42", "Running", "2"))  # the user's own Fedora
+    assert not p.present() and p.status()["valid"] is False and p.status()["why"] == "no Liminal install: its setup installs Liminal-Fedora"
+    fake.distributions.append(("Liminal-Fedora", "Running", "2"))
+    assert p.present() and p.status()["valid"] is True
+    assert WslFedoraPlugin(wsl=Wsl(runner=FakeWsl(online=[]))).install_name == "FedoraLinux-42"  # the list unread: the fallback
     monkeypatch.setenv("WSL_FEDORA_DISTRIBUTION", "Fedora-custom")
-    assert p.distribution_name == "Fedora-custom"
+    assert p.distribution_name == "Fedora-custom" and p.status()["valid"] is False  # named as the user's: not Liminal's
 
 
 def test_docker_comes_from_dockers_own_repository_for_the_distribution():

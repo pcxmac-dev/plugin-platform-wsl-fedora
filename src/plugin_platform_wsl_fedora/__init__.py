@@ -10,11 +10,9 @@ WslDistribution (liminal_libs.machines.wsl); this module says which distribution
 """
 from __future__ import annotations
 
-import os
-
 from liminal_libs.machines.wsl import WslDistribution, WslError
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
 
 def _read_text(url: str) -> str:
@@ -30,34 +28,24 @@ class WslFedoraPlugin(WslDistribution):
     about = "Fedora in WSL 2 on this Windows PC, with Docker inside: the Linux the platform's containers run in"
     api = "2.1"
     order = 701
-    distribution = "FedoraLinux-42"
+    distribution = "Liminal-Fedora"  # Liminal's own, beside any Fedora of the user's (never the user's)
     family = "dnf"
     docker_repository = "https://download.docker.com/linux/fedora"  # Docker's own, as its documentation gives it
-    install_name = "FedoraLinux-42"
+    FALLBACK = "FedoraLinux-42"  # installed from when Microsoft's list cannot be read
     DISTRIBUTION_VAR = "WSL_FEDORA_DISTRIBUTION"
     USER_VAR = "WSL_FEDORA_USER"
 
     @property
-    def distribution_name(self) -> str:
-        """WSL_FEDORA_DISTRIBUTION, else the Fedora installed (FedoraLinux-NN), else the newest on Microsoft's list,
-        else FedoraLinux-42 (the name carries the release)."""
-        named = (os.environ.get(self.DISTRIBUTION_VAR) or "").strip()
-        if named:
-            return named
+    def install_name(self) -> str:  # type: ignore[override]
+        """The newest FedoraLinux-NN on Microsoft's list, installed as Liminal-Fedora (FedoraLinux-42 when the list
+        cannot be read)."""
         try:
-            installed = sorted((d.name for d in self.wsl.distributions() if d.name.lower().startswith("fedora")), reverse=True)
-            if installed:
-                return installed[0]
             online = sorted((n for n in self.wsl.online() if n.lower().startswith("fedoralinux-")), reverse=True)
             if online:
                 return online[0]
-        except Exception:  # noqa: BLE001 - no WSL to ask: the default name
+        except Exception:  # noqa: BLE001 - no WSL to ask: the fallback
             pass
-        return self.distribution
-
-    @property
-    def install_name(self) -> str:  # type: ignore[override]
-        return self.distribution_name
+        return self.FALLBACK
 
 
 MACHINE = WslFedoraPlugin()
