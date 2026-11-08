@@ -45,6 +45,7 @@ def test_the_plugin_names_its_distribution_and_offers_its_engine(monkeypatch):
     fake = FakeWsl(distributions=[("Liminal-Fedora", "Running", "2")], docker=True)
     p = WslFedoraPlugin(wsl=Wsl(runner=fake))
     assert p.present() and p.status()["engine"]["installed"] and p.status()["family"] == "dnf"
+    assert "services" in p.interface()["hooks"] and p.status()["services"]["scanned"] is False  # the stand-in answers no scan: said
     (inst,) = p.instances()
     assert inst.name == "wsl-fedora" and inst.command == f"wsl -d {p.distribution_name} --exec docker" and inst.translate("C:\\\\x") == "/mnt/c/x"
     assert p.run("echo", "hi") == "echo hi\n"
