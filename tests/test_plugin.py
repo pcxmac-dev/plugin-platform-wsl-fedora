@@ -69,3 +69,9 @@ def test_docker_comes_from_dockers_own_repository_for_the_distribution():
     script = MACHINE.install_script()
     assert MACHINE.docker_repository == "https://download.docker.com/linux/fedora" and "{repository}" not in script
     assert "--from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo " in script and "dnf -y install docker-ce " in script
+
+
+def test_it_checks_this_pc_updates_its_packages_and_opens_a_terminal():
+    """liminal-libs 1.26.0: the check before the install, the packages' update, the login terminal."""
+    assert {"check", "update_packages", "terminal"} <= set(MACHINE.interface()["hooks"])
+    assert MACHINE.space_gb == 4.0 and "AMD64" in MACHINE.architectures and "ARM64" in MACHINE.architectures
