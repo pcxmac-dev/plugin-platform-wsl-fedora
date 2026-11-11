@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.9.0 (2026-11-11)
+
+Its API on its page, plugin API 2.2 (the user: "each plugin should reflect the the API its attached to, and present
+links that provide documentation, the plugin interface should more or less contain what it already has, BUT, it should
+also expose more of what the API is about"). Four cards (`apis.py`), each with the makers' pages, every part of the API
+said covered or not, and every call the plugin makes beside the API's other notable ones:
+- WSL (wsl.exe): Microsoft's basic commands, install, wsl.conf and .wslconfig, systemd and import pages, its releases
+  and source; the wsl commands the setup and the tasks send, and WSL's own record (Lxss) read and renamed.
+- DNF: DNF5's documentation and its upgrade, install and config-manager pages, Fedora's DNF and WSL pages, DNF5's
+  releases, the changes from DNF4 (both ways of adding a repository are tried).
+- Docker Engine: Docker's Fedora install page, post-installation steps, CLI and dockerd references, release notes,
+  its rpm repository and status page.
+- systemd, the install's init: the services scan and Pause (systemd's freezer).
+
+`api_facts()` says what the plugin kept while it ran, asking nothing: Microsoft's list as last read and its newest
+Fedora, Docker inside as last seen, the init of the last services scan. Tests: the cards name every wsl command the
+plugin sends over the whole setup and every task (a stand-in PC), and the commands its scripts run inside; a link check
+runs with LIMINAL_VENDOR_PAGES=1. Needs liminal-libs>=1.49.0.
+
 ## 0.8.0 (2026-11-09)
 
 Update packages among an install's tasks, liminal-libs 1.39.0's (the user: "move the update packages on to the TASK"):

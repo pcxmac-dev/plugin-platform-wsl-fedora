@@ -6,13 +6,20 @@ user, Docker inside, the engine started, the user in the docker group), and its 
 framework as the Docker instance `wsl-fedora` (liminal_libs.docker.instances). Everything is the library's
 WslDistribution (liminal_libs.machines.wsl); this module says which distribution.
 
+What it attaches to (0.9.0, plugin API 2.2; the user, 2026-11-11: "each plugin should reflect the the API its attached
+to, and present links that provide documentation"): wsl.exe, Fedora's DNF, Docker Engine and the install's init
+(systemd), each with the makers' pages, its parts and its calls (apis.py), drawn on the plugin's page; `api_facts` says
+what the plugin kept of them while it ran.
+
     python -m plugin_platform_wsl_fedora status | setup [STEP ...] | run -- COMMAND | instances
 """
 from __future__ import annotations
 
 from liminal_libs.machines.wsl import WslDistribution, WslError
 
-__version__ = "0.8.0"
+from .apis import APIS, facts
+
+__version__ = "0.9.0"
 
 
 def _read_text(url: str) -> str:
@@ -27,7 +34,8 @@ class WslFedoraPlugin(WslDistribution):
     ICON = "fedora"  # Fedora's bubble and its f (liminal-libs 1.33.0's icons.js)
     title = "WSL Fedora"
     about = "Fedora in WSL 2 on this Windows PC, with Docker inside: the Linux the platform's containers run in"
-    api = "2.1"
+    api = "2.2"
+    apis = APIS  # what it attaches to: wsl.exe, DNF, Docker Engine, systemd (apis.py)
     order = 701
     distribution = "Liminal-Fedora"  # Liminal's own, beside any Fedora of the user's (never the user's)
     family = "dnf"
@@ -35,6 +43,11 @@ class WslFedoraPlugin(WslDistribution):
     FALLBACK = "FedoraLinux-42"  # installed from when Microsoft's list cannot be read
     DISTRIBUTION_VAR = "WSL_FEDORA_DISTRIBUTION"
     USER_VAR = "WSL_FEDORA_USER"
+
+    def api_facts(self) -> dict:
+        """What it kept of its APIs while it ran, asking nothing (never `install_name`, which may read Microsoft's list):
+        that list as last read and its newest Fedora, Docker inside as last seen, the init the last scan found."""
+        return facts(self)
 
     @property
     def install_name(self) -> str:  # type: ignore[override]

@@ -11,7 +11,7 @@ well, same scope/function".
 
 ## What it does
 
-A machine plugin of the platform (`liminal_libs.machines.MachinePlugin`, plugin API 2.1), the library's
+A machine plugin of the platform (`liminal_libs.machines.MachinePlugin`, plugin API 2.2), the library's
 `WslDistribution` with this distribution's name and family. Its hooks:
 
 - `present()`: whether the distribution is installed in WSL.
@@ -61,3 +61,32 @@ DNS servers, SSH, VPNs, the firewall, Liminal's own apps) are listed with what e
 known here is listed with its own description; the system's own (logging, time, devices, D-Bus, logins, package
 daemons, the WSL bridge) are counted and named in a note, with any that failed. The platform's page shows the table;
 the scan runs only while the distribution runs and is kept 30 s: a status never starts a stopped distribution.
+
+## Its API
+
+The user's words (2026-11-11): "each plugin should reflect the the API its attached to, and present links that provide
+documentation, the plugin interface should more or less contain what it already has, BUT, it should also expose more of
+what the API is about". Since 0.9.0 (plugin API 2.2) the plugin declares what it attaches to (`apis.py`), and the
+platform's page draws each card: what the API is, its links, every part of it (those the plugin uses first, the rest
+under "more of the API") and every call it makes, with the API's other notable calls beside them.
+
+- **WSL (wsl.exe)**, Microsoft's: [Basic commands](https://learn.microsoft.com/en-us/windows/wsl/basic-commands),
+  [Install WSL](https://learn.microsoft.com/en-us/windows/wsl/install),
+  [wsl.conf and .wslconfig](https://learn.microsoft.com/en-us/windows/wsl/wsl-config),
+  [systemd in WSL](https://learn.microsoft.com/en-us/windows/wsl/systemd),
+  [releases](https://github.com/microsoft/WSL/releases). The plugin installs Liminal-Fedora with it (the newest
+  FedoraLinux-NN on Microsoft's list) and runs everything inside through it; WSL's own record of each install (its Lxss
+  registry key, which Microsoft documents no page for) is read to list them, and written only by Rename.
+- **DNF**, Fedora's packages: [DNF5's documentation](https://dnf5.readthedocs.io/en/latest/),
+  [Using DNF](https://docs.fedoraproject.org/en-US/quick-docs/dnf/), [Fedora in WSL](https://docs.fedoraproject.org/en-US/cloud/wsl/).
+  Fedora's pages refuse automated readers (a check page), but answer.
+- **Docker Engine**, from Docker's own repository: [Install Docker Engine on Fedora](https://docs.docker.com/engine/install/fedora/),
+  [post-installation steps](https://docs.docker.com/engine/install/linux-postinstall/),
+  [release notes](https://docs.docker.com/engine/release-notes/).
+- **systemd**, the install's init: [systemctl(1)](https://www.freedesktop.org/software/systemd/man/latest/systemctl.html):
+  the services scan, and Pause (systemd's freezer).
+
+`api_facts()` says what the plugin kept of them while it ran, asking nothing: Microsoft's list as last read and the
+newest Fedora on it, Docker inside as last seen, the init the last services scan found. Every address on the cards was
+read on 2026-11-11; the test `test_the_cards_pages_answer` asks each of them again when `LIMINAL_VENDOR_PAGES=1` is set
+(it is skipped otherwise).
