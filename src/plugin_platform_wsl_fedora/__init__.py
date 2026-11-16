@@ -19,7 +19,7 @@ from liminal_libs.machines.wsl import WslDistribution, WslError
 
 from .apis import APIS, facts
 
-__version__ = "0.9.0"
+__version__ = "0.9.1"
 
 
 def _read_text(url: str) -> str:
@@ -32,6 +32,7 @@ def _read_text(url: str) -> str:
 class WslFedoraPlugin(WslDistribution):
     name = "wsl-fedora"
     ICON = "fedora"  # Fedora's bubble and its f (liminal-libs 1.33.0's icons.js)
+    SECTION = "os"  # drawn under the platform's OS plugins (liminal-platform 0.26.0)
     title = "WSL Fedora"
     about = "Fedora in WSL 2 on this Windows PC, with Docker inside: the Linux the platform's containers run in"
     api = "2.2"
